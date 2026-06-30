@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="/rc-logo-long-email-blue.png">
 <title>Affiliate Program | ReplyCleverly</title>
 <meta name="description" content="Earn recurring commission by referring businesses to ReplyCleverly. Join our affiliate program and grow with us.">
 <link rel="canonical" href="https://www.replycleverly.com/affiliate/">
@@ -3202,13 +3204,13 @@ window.addEventListener('DOMContentLoaded',function(){
         <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;"><input type="checkbox" style="margin-top:3px;accent-color:#333333;flex-shrink:0;"><span style="font-size:0.82rem;color:#333333;line-height:1.65;">I understand that any violation of the ReplyCleverly Affiliate Program Terms of Service may result in immediate termination and forfeiture of all commissions.</span></label>
       </div>
 
-      <button style="width:100%;padding:14px;background:#1A35D8;color:#fff;font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:1rem;border:none;border-radius:12px;cursor:pointer;margin-top:8px;" onmouseover="this.style.background='#1429b0'" onmouseout="this.style.background='#1A35D8'">Submit Application</button>
+      <button onclick="submitAffiliate(this)" style="width:100%;padding:14px;background:#1A35D8;color:#fff;font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:1rem;border:none;border-radius:12px;cursor:pointer;margin-top:8px;" onmouseover="this.style.background='#1429b0'" onmouseout="this.style.background='#1A35D8'">Submit Application</button>
     </div>
     <!-- LOGIN FORM -->
     <div id="aff-login-form" style="display:none;background:#ffffff;border-radius:20px;padding:36px;border:1.5px solid #333333;">
       <div style="margin-bottom:16px;"><label style="display:block;font-size:0.82rem;font-weight:600;color:#333333;margin-bottom:6px;">Email Address</label><input type="email" placeholder="Enter your email address" style="width:100%;padding:12px 14px;border:1.5px solid #333333;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.92rem;color:#333333;outline:none;box-sizing:border-box;background:#ffffff;transition:border-color 0.2s;" onfocus="this.style.borderColor='#333333'" onblur="this.style.borderColor='#e5e7eb'"></div>
       <div style="margin-bottom:16px;"><label style="display:block;font-size:0.82rem;font-weight:600;color:#333333;margin-bottom:6px;">Password</label><input type="password" placeholder="Your password" style="width:100%;padding:12px 14px;border:1.5px solid #333333;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.92rem;color:#333333;outline:none;box-sizing:border-box;background:#ffffff;transition:border-color 0.2s;" onfocus="this.style.borderColor='#333333'" onblur="this.style.borderColor='#e5e7eb'"></div>
-      <button style="width:100%;padding:14px;background:#1A35D8;color:#fff;font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:1rem;border:none;border-radius:12px;cursor:pointer;margin-top:8px;" onmouseover="this.style.background='#1429b0'" onmouseout="this.style.background='#1A35D8'">Sign In to Affiliate Dashboard</button>
+      <button onclick="window.location.href='https://affiliate.replycleverly.com/login'" style="width:100%;padding:14px;background:#1A35D8;color:#fff;font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:1rem;border:none;border-radius:12px;cursor:pointer;margin-top:8px;" onmouseover="this.style.background='#1429b0'" onmouseout="this.style.background='#1A35D8'">Sign In to Affiliate Dashboard</button>
       <p style="text-align:center;font-size:0.83rem;color:#333333;margin-top:14px;">Don&rsquo;t have an account? <a href="javascript:void(0)" onclick="affTab('signup')" style="color:#333333;font-weight:600;">Sign Up</a></p>
     </div>
   </div>
@@ -4495,6 +4497,43 @@ window.addEventListener('DOMContentLoaded',function(){
   if(em) em.addEventListener('click',function(e){if(e.target===this)closeEnterpriseModal();});
 });
 
+function submitAffiliate(btn){
+  var f=document.getElementById('aff-signup-form');
+  if(!f) return;
+  var val=function(sel){var e=f.querySelector(sel);return e?(e.value||'').trim():'';};
+  var selects=f.querySelectorAll('select');
+  var firstName=val('input[placeholder="Enter your first name"]');
+  var lastName=val('input[placeholder="Enter your last name"]');
+  var email=val('input[type=email]');
+  var company=val('input[placeholder="Your company or brand"]');
+  var phone=val('input[type=tel]');
+  var country=selects[0]?selects[0].value:'';
+  var profSel=document.getElementById('aff-prof-sel');
+  var profession=profSel?profSel.value:'';
+  if(profession==='Other'){ profession=val('input[placeholder="Describe your profession"]')||'Other'; }
+  var source=val('textarea');
+  var socialLink=val('input[type=url]');
+  var agreed=true;
+  f.querySelectorAll('input[type=checkbox]').forEach(function(c){ if(!c.checked) agreed=false; });
+  if(!firstName||!lastName||!email||!phone||!profession){ alert('Please fill in all required fields.'); return; }
+  if(!agreed){ alert('Please accept all of the affiliate program acknowledgements.'); return; }
+  var orig=btn.textContent; btn.disabled=true; btn.style.opacity='0.7'; btn.textContent='Submitting...';
+  fetch('https://affiliate.replycleverly.com/api/applications',{
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({firstName:firstName,lastName:lastName,email:email,company:company,phone:phone,country:country,profession:profession,socialLink:socialLink,source:source,agreed:true})
+  }).then(function(r){ return r.json().then(function(d){ return {ok:r.ok,d:d}; }); })
+   .then(function(res){
+     if(res.ok){
+       f.innerHTML='<div style="text-align:center;padding:48px 16px;"><div style="width:64px;height:64px;border-radius:50%;background:rgba(26,53,216,0.1);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#1A35D8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><h3 style="font-family:\'Bricolage Grotesque\',sans-serif;font-weight:800;color:#1A35D8;font-size:1.3rem;margin:0 0 8px;">Application submitted!</h3><p style="color:#333333;font-size:0.95rem;line-height:1.6;margin:0;">Thanks for applying to the ReplyCleverly Affiliate Program. Our team will review your application and get back to you at <strong>'+email+'</strong> soon.</p></div>';
+     } else {
+       alert((res.d && res.d.error) ? res.d.error : 'Something went wrong. Please try again.');
+       btn.disabled=false; btn.style.opacity='1'; btn.textContent=orig;
+     }
+   }).catch(function(){
+     alert('Network error. Please check your connection and try again.');
+     btn.disabled=false; btn.style.opacity='1'; btn.textContent=orig;
+   });
+}
 function affTab(t){
   document.getElementById('aff-signup-form').style.display = t==='signup'?'block':'none';
   document.getElementById('aff-login-form').style.display = t==='login'?'block':'none';
